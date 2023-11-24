@@ -1,13 +1,13 @@
 # Site settings
 title: sanlin Blog
-SEOTitle: sanlin | BY Blog
+SEOTitle: sanlin | sanlinblackball Blog
 header-img: img/post-bg-desk.jpg
 email: sanlinblackball@163.com
 description: "但为君故,沉吟至今"
 keyword: "sanlin, sanlin Blog, lin的博客, linzhiqing, react native, iOS, Apple, iPhone"
 url: "https://sanlinblackball.github.io"          # your host, for absolute URL
 baseurl: ""      # for example, '/blog' if your blog hosted on 'host/blog'
-github_repo: "https://github.com/qiubaiying/qiubaiying.github.io.git" # you code repository
+github_repo: "https://github.com/sanlinblackball/sanlinblackball.github.io.git" # you code repository
 
 # Sidebar settings
 sidebar: true                           # whether using Sidebar.
