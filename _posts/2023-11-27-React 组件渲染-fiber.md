@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      React 组件渲染
-subtitle:   一问读懂 React 组件渲染
+subtitle:   Fiber到底是什么
 date:       2023-11-27
 author:     sanlinblackball
 header-img: img/Ju-ITc1Cc0w.jpg
@@ -13,7 +13,13 @@ tags:
 ---
 
 ## 前言
-在React开发中不可避免 我们总要用到`setState` 或者 `useState`相关以此来更新界面，但是在渲染中究竟发生了什么呢？让我们带着疑问一步一步看看。
+在React开发中不可避免 我们总要用到`setState` 或者 `useState`相关以此来更新界面，但是在渲染中究竟发生了什么呢？让我们带着疑问一步一步看看。。为了让读者看的明白清楚 我内容一份为三。
+
+1.   Fiber到底是什么
+2.  [组件到底是怎么render的](../../../../2023/12/27/React-组件渲染-render)
+3.  commit 阶段react做了哪些事情
+
+
 ## 前置
 在React 中我们使用的是 `声明式渲染` ，我们 只需要声明与描述 就可以渲染出我们所需要的东西。声明式渲染是现代前端框架的比较普遍的设计思路。
 而我们在编写类似 `HTML` 的语法编写组件时，通过`Babel`转成了浏览器能够识别的样子，在通过“加工”呈现在了用户面前。 `Babel` 把JSX编译成 `React.createElement` 的样子。
@@ -146,6 +152,7 @@ function FiberNode(tag, pendingProps, key, mode) {
 
 ![fiber](/img/fiber_set.jpg)
 
+
 react采取的遍历为深度优先遍历，可以粗鲁的认为遍历顺序为
 ``` js
 child -> sibling -> parent
@@ -201,27 +208,13 @@ var ShouldCapture = /*         */2048;
 ```
 每个`Fiber`都维护着一个`effectList`链表，一个fiber的effect list只包括他`children`的更新，不包括他本身，保存着`reconciliation`阶段的结果，每个`effectList`包括`nextEffect`、`firstEffect`、`lastEffect`三个指针，分别指向下一个待处理的effect fiber，第一个和最后一个待处理的effect fiber。react调用`completeUnitOfWork`沿`workInProgress`进行effect list的收集
 
-## render
-`render` 是我们React中最关键的一步，它和页面的渲染息息相关，那到底他做了什么呢？
 
-上面我们提到了在渲染的时候 在缓存中会存在一个(首次1个后续两个)`VDOM`，`render`经过对比前后两次的DOM的区别，并通过打标记的方式对发生的改变的地方进行增删改。简单说，render 过程就是 React 「对比旧 Fiber 树和新的 element」 然后「为新的 element 生成新 Fiber 树」的一个过程。让我们更详细一些。
 
-根据源码我们得知 从源码中看，React 的整个核心流程开始于 `performSyncWorkOnRoot` 函数，在这个函数中，会根据`root`的`mode`来决定是同步模式还是异步模式，然后会根据`root`的`current`指针来找到当前的`Fiber`，然后会根据`current`指针的`tag`来进行不同的处理。
 
-```js
-function performSyncWorkOnRoot(root) {
-  .....
-  var exitStatus = renderRootSync(root, lanes);
-  var finishedWork = root.current.alternate;
-  root.finishedWork = finishedWork;
-  root.finishedLanes = lanes;
-  commitRoot(root, workInProgressRootRecoverableErrors, workInProgressTransitions);
-  .....
-}
-```
-上面就是整个核心流程起始地，我们发现，在 `performSyncWorkOnRoot`中我们主要执行了 `renderRootSync` 函数和 `commitRoot` 函数,一个是 `对比旧 Fiber 树和新的 element`，另外一个是用于`执行 Fiber 树中的更新操作并将更新应用到真实的 DOM 上（执行副作用操作）`。当然这里看不懂没有问题，我们会详细讲解一下这两个方法。
 
-回到正题，我们继续 `render` 话题。整个 `render` 过程的重点在 `workLoopSync` ,代码如下。
 
-从 「workLoopSync」 简单的函数定义里我们可以看到，这里用了一个循环来不断调用 「performUnitOfWork」 方法，直到 workInProgress 为 null。
+
+
+
+
 
